@@ -10,8 +10,12 @@ export const TRANSLATIONS = {
         notEnoughCoins: 'Nepakanka monetų! 💰',
         playMore: 'Žaisk daugiau matematikos žaidimų!',
         newMonster: 'Naujas monstras! 🎉',
-        collectedAll: 'Surinkai visus!'
+        collectedAll: 'Surinkai visus!',
+        unlocked: 'Atrakinta',
+        yes: 'Taip!',
+        no: 'Ne'
     },
+
     en: {
         learnAndEarn: 'Learn & Earn',
         monsterRoom: 'Monster Room',
@@ -23,6 +27,10 @@ export const TRANSLATIONS = {
         notEnoughCoins: 'Not enough coins! 💰',
         playMore: 'Play more math games!',
         newMonster: 'New Monster! 🎉',
-        collectedAll: 'Collected all!'
+        collectedAll: 'Collected all!',
+        unlocked: 'Unlocked',
+        yes: 'Yes!',
+        no: 'No'
     }
+
 };

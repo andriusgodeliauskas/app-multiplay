@@ -85,8 +85,9 @@ const MonsterScreen = () => {
 
                 <View style={[styles.priceTag, isUnlocked && styles.unlockedTag]}>
                     <Text style={styles.priceText}>
-                        {isUnlocked ? 'Unlocked' : `${monster.cost}`}
+                        {isUnlocked ? t.unlocked : `${monster.cost}`}
                     </Text>
+
                     {!isUnlocked && <Coins size={12} color={COLORS.coins} style={{ marginLeft: 2 }} />}
                 </View>
             </TouchableOpacity>
@@ -135,14 +136,14 @@ const MonsterScreen = () => {
                                 style={[styles.modalButton, styles.cancelButton]}
                                 onPress={() => setModalVisible(false)}
                             >
-                                <Text style={styles.cancelButtonText}>Ne</Text>
+                                <Text style={styles.cancelButtonText}>{t.no}</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.confirmButton]}
                                 onPress={confirmPurchase}
                             >
-                                <Text style={styles.confirmButtonText}>Taip!</Text>
+                                <Text style={styles.confirmButtonText}>{t.yes}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
