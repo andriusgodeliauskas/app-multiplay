@@ -62,7 +62,7 @@ const MathScreen = () => {
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
                 Animated.spring(scaleAnimation, { toValue: 1, useNativeDriver: true }),
             ]).start(() => {
-                setTimeout(generateProblem, 1200);
+                setTimeout(generateProblem, 2500); // Longer celebration time
             });
         } else {
             setFeedback({ type: 'wrong' });
