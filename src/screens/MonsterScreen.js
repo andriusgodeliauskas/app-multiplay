@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Animated, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Animated, Alert, ScrollView, Platform } from 'react-native';
 import { useGame, MONSTERS_POOL } from '../context/GameContext';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 import { Coins, Lock, CheckCircle } from 'lucide-react-native';
@@ -17,28 +17,37 @@ const MonsterScreen = () => {
         if (unlockedMonsterIds.includes(monster.id)) return;
 
         if (coins < monster.cost) {
-            Alert.alert(t.notEnoughCoins, t.playMore);
+            if (Platform.OS === 'web') {
+                alert(`${t.notEnoughCoins}\n${t.playMore}`);
+            } else {
+                Alert.alert(t.notEnoughCoins, t.playMore);
+            }
             return;
         }
 
-        Alert.alert(
-            t.monsterRoom,
-            `${monster.emoji}? Cost: ${monster.cost} 💰`,
-            [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                    text: 'Unlock!',
-                    onPress: () => {
-                        const result = buyMonster(monster.id);
-                        if (result.success) {
-                            // Perfect!
-                        } else {
-                            Alert.alert("Oops!", result.message);
+        const confirmMessage = `${monster.emoji}? Cost: ${monster.cost} 💰`;
+
+        if (Platform.OS === 'web') {
+            if (window.confirm(confirmMessage)) {
+                const result = buyMonster(monster.id);
+                if (!result.success) alert(result.message);
+            }
+        } else {
+            Alert.alert(
+                t.monsterRoom,
+                confirmMessage,
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                        text: 'Unlock!',
+                        onPress: () => {
+                            const result = buyMonster(monster.id);
+                            if (!result.success) Alert.alert("Oops!", result.message);
                         }
                     }
-                }
-            ]
-        );
+                ]
+            );
+        }
     };
 
     const renderMonsterItem = ({ item: monster }) => {
