@@ -32,11 +32,11 @@ function MainNavigator() {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.1,
           shadowRadius: 4,
-          height: 80,
+          height: 60,
           justifyContent: 'center',
         },
         tabBarLabelStyle: {
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: '900',
           textTransform: 'none',
         },

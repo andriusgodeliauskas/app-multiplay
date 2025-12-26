@@ -5,20 +5,24 @@ import { COLORS, SPACING } from '../constants/theme';
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 export const MathGrid = ({ rows, cols }) => {
-    const rowArray = Array.from({ length: rows });
-    const colArray = Array.from({ length: cols });
+    // Auto-rotate if it's too tall (e.g., 12x4) and would fit better horizontally (4x12)
+    const shouldRotate = rows > cols;
+    const effectiveRows = shouldRotate ? cols : rows;
+    const effectiveCols = shouldRotate ? rows : cols;
+
+    const rowArray = Array.from({ length: effectiveRows });
+    const colArray = Array.from({ length: effectiveCols });
 
     // Dynamic dot size based on columns AND rows
-    // Max width/height to keep it "not static/too tall"
-    const maxGridWidth = Math.min(windowWidth - 60, 500);
-    const maxGridHeight = Math.min(windowHeight * 0.25, 220); // Much smaller max height
+    const maxGridWidth = Math.min(windowWidth - 40, 600);
+    const maxGridHeight = Math.min(windowHeight * 0.25, 180);
 
     // Calculate cell size that fits both dimensions
-    const cellWidth = Math.floor(maxGridWidth / cols) - 2;
-    const cellHeight = Math.floor(maxGridHeight / rows) - 2;
+    const cellWidth = Math.floor(maxGridWidth / effectiveCols) - 2;
+    const cellHeight = Math.floor(maxGridHeight / effectiveRows) - 2;
 
-    // Cap at 22px to keep it compact
-    const cellSize = Math.min(22, cellWidth, cellHeight);
+    // Choose the smaller one, cap at 20px
+    const cellSize = Math.min(20, cellWidth, cellHeight);
     const dotSize = cellSize * 0.7;
 
     return (

@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: SPACING.md,
+        marginVertical: 4,
     },
     langToggle: {
         flexDirection: 'row',
@@ -261,14 +261,16 @@ const styles = StyleSheet.create({
     gameArea: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: SPACING.md,
+        marginVertical: 4,
     },
+
     problemText: {
-        fontSize: 56, // Smaller
+        fontSize: 48, // Even smaller
         fontWeight: '900',
         color: COLORS.text,
-        marginBottom: 4,
+        marginBottom: 2,
     },
+
 
     rewardIndicator: {
         flexDirection: 'row',
