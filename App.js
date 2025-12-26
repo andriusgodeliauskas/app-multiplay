@@ -1,4 +1,5 @@
 import React from 'react';
+// Version: 1.0.1 - Vercel Fix
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GameProvider } from './src/context/GameContext';
