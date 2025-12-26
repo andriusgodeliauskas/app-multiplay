@@ -36,10 +36,15 @@ const MathScreen = () => {
         }
         const allOptions = [result, ...Array.from(distractors)].sort(() => Math.random() - 0.5);
 
-        setProblem({ a: displayA, b: displayB, result });
+        // Calculate potential reward based on difficulty (A + B)
+        const difficulty = a + b;
+        const potentialReward = Math.max(5, (difficulty - 3) * 5);
+
+        setProblem({ a: displayA, b: displayB, result, reward: potentialReward });
         setOptions(allOptions);
         setFeedback(null);
     }, [currentLevel]);
+
 
     useEffect(() => {
         generateProblem();
@@ -47,13 +52,11 @@ const MathScreen = () => {
 
     const handleAnswer = (selected) => {
         if (selected === problem.result) {
-            // Difficulty-based rewards: sum of numbers determines the bonus
-            // 2x2 = 5 coins, 5x5 = 20 coins, 9x9 = 40 coins
-            const difficulty = problem.a + problem.b;
-            const earnedCoins = Math.max(5, (difficulty - 3) * 5);
+            const earnedCoins = problem.reward;
 
             setFeedback({ type: 'correct', amount: earnedCoins });
             addCoins(earnedCoins);
+
 
             Animated.sequence([
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
@@ -114,7 +117,16 @@ const MathScreen = () => {
                     { transform: [{ translateX: shakeAnimation }, { scale: scaleAnimation }] }
                 ]}>
                     <Text style={styles.problemText}>{problem.a} × {problem.b} = ?</Text>
+
+                    {problem.reward > 0 && !feedback && (
+                        <View style={styles.rewardIndicator}>
+                            <Text style={styles.rewardText}>+{problem.reward}</Text>
+                            <Coins size={20} color={COLORS.coins} fill={COLORS.coins} style={{ marginLeft: 4 }} />
+                        </View>
+                    )}
+
                     <MathGrid rows={problem.a} cols={problem.b} />
+
 
                     {feedback && (
                         <View style={styles.feedbackOverlay}>
@@ -256,6 +268,23 @@ const styles = StyleSheet.create({
         color: COLORS.text,
         marginBottom: SPACING.xs,
     },
+    rewardIndicator: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF9C4', // Soft yellow
+        paddingHorizontal: 15,
+        paddingVertical: 6,
+        borderRadius: 15,
+        marginBottom: 10,
+        borderWidth: 2,
+        borderColor: COLORS.coins,
+    },
+    rewardText: {
+        fontSize: 20,
+        fontWeight: '900',
+        color: COLORS.text,
+    },
+
 
     feedbackOverlay: {
         position: 'absolute',
