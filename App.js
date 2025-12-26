@@ -1,5 +1,4 @@
 import React from 'react';
-// Version: 1.0.1 - Vercel Fix
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GameProvider } from './src/context/GameContext';
@@ -8,7 +7,6 @@ import MonsterScreen from './src/screens/MonsterScreen';
 import { Calculator, Ghost } from 'lucide-react-native';
 import { COLORS } from './src/constants/theme';
 import { StatusBar } from 'expo-status-bar';
-
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 
@@ -17,22 +15,31 @@ const Tab = createBottomTabNavigator();
 export default function App() {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
-  const maxAppWidth = 600; // Optimal tablet-like width for laptop screens
+  const maxAppWidth = 600;
 
   return (
     <SafeAreaProvider>
-      <View style={[styles.outerContainer, isWeb && { backgroundColor: '#E0F2F1' }]}>
+      <View style={[styles.outerContainer, isWeb && { backgroundColor: '#F0F4F8' }]}>
         <View style={[
           styles.innerContainer,
-          isWeb && width > maxAppWidth && { width: maxAppWidth, alignSelf: 'center', elevation: 20 }
+          isWeb && width > maxAppWidth && {
+            width: maxAppWidth,
+            alignSelf: 'center',
+            marginVertical: 20,
+            borderRadius: 30,
+            overflow: 'hidden',
+            elevation: 20,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.2,
+            shadowRadius: 20,
+          }
         ]}>
           <GameProvider>
-
             <NavigationContainer>
               <StatusBar style="auto" />
-
               <Tab.Navigator
-                screenOptions={{
+                screenOptions={({ route }) => ({
                   headerShown: false,
                   tabBarStyle: {
                     backgroundColor: '#FFFFFF',
@@ -48,7 +55,7 @@ export default function App() {
                     fontSize: 12,
                     fontWeight: 'bold',
                   },
-                }}
+                })}
               >
                 <Tab.Screen
                   name="Math"
@@ -83,10 +90,5 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 20,
   }
 });
-

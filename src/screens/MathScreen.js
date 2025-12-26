@@ -1,34 +1,42 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView } from 'react-native';
 import { useGame } from '../context/GameContext';
 import { MathGrid } from '../components/MathGrid';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
-import { Coins, Star } from 'lucide-react-native';
+import { Coins, Star, Languages } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
+const { width: windowWidth } = Dimensions.get('window');
 
 const MathScreen = () => {
-    const { currentLevel, addCoins, updateLevel, coins } = useGame();
+    const { currentLevel, addCoins, updateLevel, coins, language, toggleLanguage, t } = useGame();
     const [problem, setProblem] = useState({ a: 0, b: 0, result: 0 });
     const [options, setOptions] = useState([]);
-    const [feedback, setFeedback] = useState(null); // 'correct' or 'wrong'
+    const [feedback, setFeedback] = useState(null);
     const shakeAnimation = useState(new Animated.Value(0))[0];
     const scaleAnimation = useState(new Animated.Value(1))[0];
 
     const generateProblem = useCallback(() => {
-        const a = currentLevel;
-        const b = Math.floor(Math.random() * 10) + 1; // 1 to 10
+        let a, b;
+        if (currentLevel === 0) {
+            a = Math.floor(Math.random() * 9) + 2;
+            b = Math.floor(Math.random() * 11) + 1;
+        } else {
+            a = currentLevel;
+            b = Math.floor(Math.random() * 12) + 1;
+        }
+        const displayA = Math.random() > 0.5 ? a : b;
+        const displayB = displayA === a ? b : a;
         const result = a * b;
 
-        // Generate wrong answers
-        let wrong1 = result + (Math.floor(Math.random() * 3) + 1);
-        let wrong2 = Math.max(0, result - (Math.floor(Math.random() * 3) + 1));
+        let distractors = new Set();
+        while (distractors.size < 2) {
+            let offset = (Math.floor(Math.random() * 5) + 1) * (Math.random() > 0.5 ? 1 : -1);
+            let wrong = result + offset;
+            if (wrong !== result && wrong > 0) distractors.add(wrong);
+        }
+        const allOptions = [result, ...Array.from(distractors)].sort(() => Math.random() - 0.5);
 
-        if (wrong2 === result) wrong2 = result + 4;
-
-        const allOptions = [result, wrong1, wrong2].sort(() => Math.random() - 0.5);
-
-        setProblem({ a, b, result });
+        setProblem({ a: displayA, b: displayB, result });
         setOptions(allOptions);
         setFeedback(null);
     }, [currentLevel]);
@@ -40,8 +48,7 @@ const MathScreen = () => {
     const handleAnswer = (selected) => {
         if (selected === problem.result) {
             setFeedback('correct');
-            addCoins(10);
-
+            addCoins(20); // 20 POINTS AS REQUESTED
             Animated.sequence([
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
                 Animated.spring(scaleAnimation, { toValue: 1, useNativeDriver: true }),
@@ -56,87 +63,88 @@ const MathScreen = () => {
                 Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
                 Animated.timing(shakeAnimation, { toValue: 0, duration: 50, useNativeDriver: true }),
             ]).start();
-
-            // Still move forward after a delay? Or let them try again?
-            // For kids, maybe show correct answer and move on
             setTimeout(generateProblem, 2000);
         }
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
-                <View>
-                    <Text style={styles.title}>Practice Table</Text>
-                    <View style={styles.levelSelector}>
-                        {[2, 3, 4, 5, 6, 7, 8, 9, 10].map((lvl) => (
-                            <TouchableOpacity
-                                key={lvl}
-                                onPress={() => updateLevel(lvl)}
-                                style={[
-                                    styles.levelButton,
-                                    currentLevel === lvl && styles.levelButtonActive
-                                ]}
-                            >
-                                <Text style={[
-                                    styles.levelButtonText,
-                                    currentLevel === lvl && styles.levelButtonTextActive
-                                ]}>{lvl}</Text>
-                            </TouchableOpacity>
-                        ))}
+        <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.container}>
+            <View style={styles.bootstrapContainer}>
+                <View style={styles.header}>
+                    <View style={styles.headerTitleSection}>
+                        <Text style={styles.title}>{t.practiceTable}</Text>
+                        <TouchableOpacity onPress={toggleLanguage} style={styles.langToggle}>
+                            <Languages size={18} color={COLORS.secondary} />
+                            <Text style={styles.langText}>{language.toUpperCase()}</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.coinsBadge}>
+                        <Coins color={COLORS.coins} size={24} />
+                        <Text style={styles.coinsText}>{coins}</Text>
                     </View>
                 </View>
-                <View style={styles.coinsBadge}>
-                    <Coins color={COLORS.coins} size={24} />
-                    <Text style={styles.coinsText}>{coins}</Text>
+
+                <View style={styles.levelSelector}>
+                    {[0, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lvl) => (
+                        <TouchableOpacity
+                            key={lvl}
+                            onPress={() => updateLevel(lvl)}
+                            style={[
+                                styles.levelButton,
+                                currentLevel === lvl && styles.levelButtonActive,
+                                lvl === 0 && styles.mixButton
+                            ]}
+                        >
+                            <Text style={[
+                                styles.levelButtonText,
+                                currentLevel === lvl && styles.levelButtonTextActive
+                            ]}>{lvl === 0 ? 'Mix' : lvl}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+
+                <Animated.View style={[
+                    styles.gameArea,
+                    { transform: [{ translateX: shakeAnimation }, { scale: scaleAnimation }] }
+                ]}>
+                    <Text style={styles.problemText}>{problem.a} × {problem.b} = ?</Text>
+                    <MathGrid rows={problem.a} cols={problem.b} />
+
+                    {feedback && (
+                        <View style={styles.feedbackOverlay}>
+                            {feedback === 'correct' ? (
+                                <>
+                                    <Star color={COLORS.accent} size={64} fill={COLORS.accent} />
+                                    <Text style={styles.feedbackText}>{t.excellent}</Text>
+                                </>
+                            ) : (
+                                <Text style={[styles.feedbackText, { color: COLORS.wrong }]}>
+                                    {t.oops} {problem.result}
+                                </Text>
+                            )}
+                        </View>
+                    )}
+                </Animated.View>
+
+                <View style={styles.optionsContainer}>
+                    {options.map((option, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            activeOpacity={0.7}
+                            style={[
+                                styles.optionButton,
+                                feedback === 'correct' && option === problem.result && styles.correctButton,
+                                feedback === 'wrong' && option === problem.result && styles.correctButtonHighlight,
+                            ]}
+                            onPress={() => !feedback && handleAnswer(option)}
+                            disabled={!!feedback}
+                        >
+                            <Text style={styles.optionText}>{option}</Text>
+                        </TouchableOpacity>
+                    ))}
                 </View>
             </View>
-
-            <Animated.View style={[
-                styles.gameArea,
-                { transform: [{ translateX: shakeAnimation }, { scale: scaleAnimation }] }
-            ]}>
-                <Text style={styles.problemText}>
-                    {problem.a} × {problem.b} = ?
-                </Text>
-
-                <MathGrid rows={problem.a} cols={problem.b} />
-
-                {feedback === 'correct' && (
-                    <View style={styles.feedbackOverlay}>
-                        <Star color={COLORS.accent} size={64} fill={COLORS.accent} />
-                        <Text style={styles.feedbackText}>EXCELLENT!</Text>
-                    </View>
-                )}
-
-                {feedback === 'wrong' && (
-                    <View style={styles.feedbackOverlay}>
-                        <Text style={[styles.feedbackText, { color: COLORS.wrong }]}>
-                            Oops! It was {problem.result}
-                        </Text>
-                    </View>
-                )}
-            </Animated.View>
-
-            <View style={styles.optionsContainer}>
-                {options.map((option, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        activeOpacity={0.7}
-                        style={[
-                            styles.optionButton,
-                            feedback === 'correct' && option === problem.result && styles.correctButton,
-                            feedback === 'wrong' && option === problem.result && styles.correctButtonHighlight,
-                        ]}
-                        onPress={() => !feedback && handleAnswer(option)}
-                        disabled={!!feedback}
-                    >
-                        <Text style={styles.optionText}>{option}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-
-        </View>
+        </ScrollView>
     );
 };
 
@@ -144,34 +152,82 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
-        padding: SPACING.md,
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        alignItems: 'center',
+        paddingVertical: SPACING.md,
+    },
+    bootstrapContainer: {
+        width: '100%',
+        maxWidth: 600, // Equivalent to Bootstrap .container on desktop
+        paddingHorizontal: SPACING.md,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginTop: SPACING.xl,
-        marginBottom: SPACING.lg,
+        alignItems: 'center',
+        marginBottom: SPACING.md,
+    },
+    headerTitleSection: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     title: {
-        fontSize: 28,
+        fontSize: 24,
         fontWeight: '900',
         color: COLORS.primary,
+        marginRight: 12,
     },
-
+    langToggle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.white,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: RADIUS.md,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+    },
+    langText: {
+        marginLeft: 4,
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: COLORS.secondary,
+    },
+    coinsBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.white,
+        paddingHorizontal: SPACING.md,
+        paddingVertical: SPACING.sm,
+        borderRadius: RADIUS.full,
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    coinsText: {
+        marginLeft: 8,
+        fontWeight: 'bold',
+        fontSize: 18,
+        color: COLORS.text,
+    },
     levelSelector: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginTop: 8,
-        maxWidth: width * 0.6,
+        marginBottom: SPACING.lg,
+        justifyContent: 'center',
     },
     levelButton: {
         backgroundColor: COLORS.white,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 10,
-        marginRight: 5,
-        marginBottom: 5,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: RADIUS.md,
+        margin: 4,
+        minWidth: 45,
+        alignItems: 'center',
         borderWidth: 1,
         borderColor: COLORS.border,
     },
@@ -186,78 +242,73 @@ const styles = StyleSheet.create({
     levelButtonTextActive: {
         color: COLORS.white,
     },
-    coinsBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: COLORS.white,
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-        borderRadius: RADIUS.full,
-        elevation: 3,
-    },
-    coinsText: {
-        marginLeft: 8,
-        fontWeight: 'bold',
-        color: COLORS.text,
+    mixButton: {
+        borderColor: COLORS.secondary,
+        borderWidth: 2,
     },
     gameArea: {
-        flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: SPACING.xl,
+        minHeight: 300,
     },
     problemText: {
-        fontSize: 64, // Larger for big screens
+        fontSize: 72,
         fontWeight: '900',
         color: COLORS.text,
         marginBottom: SPACING.md,
     },
-
     feedbackOverlay: {
         position: 'absolute',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.8)',
-        padding: 20,
-        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        padding: 30,
+        borderRadius: RADIUS.lg,
         zIndex: 10,
+        width: '100%',
     },
     feedbackText: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '900',
         color: COLORS.correct,
         marginTop: 10,
+        textAlign: 'center',
     },
     optionsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 15,
         marginBottom: SPACING.xl,
     },
     optionButton: {
         backgroundColor: COLORS.white,
-        width: 120, // Fixed larger size for touch
-        height: 120,
+        width: windowWidth > 400 ? 130 : 100,
+        height: windowWidth > 400 ? 130 : 100,
         borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 6,
         borderColor: COLORS.pastelBlue,
         elevation: 8,
-        marginHorizontal: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
     },
-
     correctButton: {
         borderColor: COLORS.correct,
         backgroundColor: '#E8F5E9',
     },
     correctButtonHighlight: {
         borderColor: COLORS.correct,
-        borderWidth: 6,
+        borderWidth: 8,
     },
     optionText: {
-        fontSize: 40,
+        fontSize: 48,
         fontWeight: 'bold',
         color: COLORS.text,
     },
-
 });
 
 export default MathScreen;
