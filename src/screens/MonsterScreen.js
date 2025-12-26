@@ -46,8 +46,8 @@ const MonsterScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.bootstrapContainer}>
+                {/* Simplified Header for Monsters */}
                 <View style={styles.header}>
-                    <Text style={styles.title}>{t.monsterRoom}</Text>
                     <View style={styles.coinsBadge}>
                         <Coins color={COLORS.coins} size={24} />
                         <Text style={styles.coinsText}>{coins}</Text>
@@ -101,14 +101,9 @@ const styles = StyleSheet.create({
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end', // Only coins badge now
         alignItems: 'center',
-        marginBottom: SPACING.lg,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: COLORS.secondary,
+        marginVertical: SPACING.md,
     },
     coinsBadge: {
         flexDirection: 'row',

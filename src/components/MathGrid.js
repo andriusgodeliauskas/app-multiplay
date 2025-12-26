@@ -2,17 +2,24 @@ import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { COLORS, SPACING } from '../constants/theme';
 
-const { width: windowWidth } = Dimensions.get('window');
+const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 export const MathGrid = ({ rows, cols }) => {
     const rowArray = Array.from({ length: rows });
     const colArray = Array.from({ length: cols });
 
-    // Dynamic dot size based on columns and available width
-    // Max width of container is 600, minus padding
-    const maxGridWidth = Math.min(windowWidth - 40, 560);
-    const cellSize = Math.min(35, Math.floor(maxGridWidth / cols) - 8);
-    const dotSize = cellSize * 0.8;
+    // Dynamic dot size based on columns AND rows
+    // Max width/height to keep it "not static/too tall"
+    const maxGridWidth = Math.min(windowWidth - 60, 500);
+    const maxGridHeight = Math.min(windowHeight * 0.4, 400); // Max 40% of screen height
+
+    // Calculate cell size that fits both dimensions
+    const cellWidth = Math.floor(maxGridWidth / cols) - 4;
+    const cellHeight = Math.floor(maxGridHeight / rows) - 4;
+
+    // Choose the smaller one so it fits in both directions, but cap at 30px
+    const cellSize = Math.min(30, cellWidth, cellHeight);
+    const dotSize = cellSize * 0.75;
 
     return (
         <View style={styles.container}>
@@ -47,9 +54,8 @@ const styles = StyleSheet.create({
         borderColor: COLORS.pastelBlue,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: SPACING.lg,
+        marginVertical: SPACING.md,
         alignSelf: 'center',
-        minHeight: 180,
         // Responsive shadow
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },

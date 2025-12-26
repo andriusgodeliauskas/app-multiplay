@@ -48,7 +48,7 @@ const MathScreen = () => {
     const handleAnswer = (selected) => {
         if (selected === problem.result) {
             setFeedback('correct');
-            addCoins(20); // 20 POINTS AS REQUESTED
+            addCoins(20);
             Animated.sequence([
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
                 Animated.spring(scaleAnimation, { toValue: 1, useNativeDriver: true }),
@@ -70,20 +70,20 @@ const MathScreen = () => {
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.container}>
             <View style={styles.bootstrapContainer}>
-                <View style={styles.header}>
-                    <View style={styles.headerTitleSection}>
-                        <Text style={styles.title}>{t.practiceTable}</Text>
-                        <TouchableOpacity onPress={toggleLanguage} style={styles.langToggle}>
-                            <Languages size={18} color={COLORS.secondary} />
-                            <Text style={styles.langText}>{language.toUpperCase()}</Text>
-                        </TouchableOpacity>
-                    </View>
+                {/* Utility Bar (Language & Coins) */}
+                <View style={styles.utilityBar}>
+                    <TouchableOpacity onPress={toggleLanguage} style={styles.langToggle}>
+                        <Languages size={18} color={COLORS.secondary} />
+                        <Text style={styles.langText}>{language.toUpperCase()}</Text>
+                    </TouchableOpacity>
+
                     <View style={styles.coinsBadge}>
                         <Coins color={COLORS.coins} size={24} />
                         <Text style={styles.coinsText}>{coins}</Text>
                     </View>
                 </View>
 
+                {/* Level Selector */}
                 <View style={styles.levelSelector}>
                     {[0, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lvl) => (
                         <TouchableOpacity
@@ -156,43 +156,35 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flexGrow: 1,
         alignItems: 'center',
-        paddingVertical: SPACING.md,
+        paddingVertical: SPACING.sm,
     },
+
     bootstrapContainer: {
         width: '100%',
-        maxWidth: 600, // Equivalent to Bootstrap .container on desktop
+        maxWidth: 600,
         paddingHorizontal: SPACING.md,
     },
-    header: {
+    utilityBar: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: SPACING.md,
-    },
-    headerTitleSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '900',
-        color: COLORS.primary,
-        marginRight: 12,
+        marginVertical: SPACING.md,
     },
     langToggle: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: COLORS.white,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
         borderRadius: RADIUS.md,
         borderWidth: 1,
         borderColor: COLORS.border,
+        elevation: 2,
     },
     langText: {
         marginLeft: 4,
-        fontSize: 12,
-        fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight: '900',
         color: COLORS.secondary,
     },
     coinsBadge: {
@@ -249,15 +241,15 @@ const styles = StyleSheet.create({
     gameArea: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: SPACING.xl,
-        minHeight: 300,
+        marginVertical: SPACING.md,
     },
     problemText: {
-        fontSize: 72,
+        fontSize: 64,
         fontWeight: '900',
         color: COLORS.text,
-        marginBottom: SPACING.md,
+        marginBottom: SPACING.xs,
     },
+
     feedbackOverlay: {
         position: 'absolute',
         alignItems: 'center',
@@ -283,14 +275,14 @@ const styles = StyleSheet.create({
     },
     optionButton: {
         backgroundColor: COLORS.white,
-        width: windowWidth > 400 ? 130 : 100,
-        height: windowWidth > 400 ? 130 : 100,
+        width: windowWidth > 400 ? 120 : 90,
+        height: windowWidth > 400 ? 120 : 90,
         borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 6,
         borderColor: COLORS.pastelBlue,
-        elevation: 8,
+        elevation: 6,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -305,7 +297,7 @@ const styles = StyleSheet.create({
         borderWidth: 8,
     },
     optionText: {
-        fontSize: 48,
+        fontSize: 40,
         fontWeight: 'bold',
         color: COLORS.text,
     },
