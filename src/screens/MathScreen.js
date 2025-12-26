@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, ScrollView } from 'react-native';
 import { useGame } from '../context/GameContext';
 import { MathGrid } from '../components/MathGrid';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
-import { Coins, Star, Languages } from 'lucide-react-native';
+import { Languages, Coins } from 'lucide-react-native';
 
 const { width: windowWidth } = Dimensions.get('window');
 
@@ -36,7 +36,6 @@ const MathScreen = () => {
         }
         const allOptions = [result, ...Array.from(distractors)].sort(() => Math.random() - 0.5);
 
-        // Calculate potential reward based on difficulty (A + B)
         const difficulty = a + b;
         const potentialReward = Math.max(5, (difficulty - 3) * 5);
 
@@ -44,7 +43,6 @@ const MathScreen = () => {
         setOptions(allOptions);
         setFeedback(null);
     }, [currentLevel]);
-
 
     useEffect(() => {
         generateProblem();
@@ -57,12 +55,11 @@ const MathScreen = () => {
             setFeedback({ type: 'correct', amount: earnedCoins });
             addCoins(earnedCoins);
 
-
             Animated.sequence([
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
                 Animated.spring(scaleAnimation, { toValue: 1, useNativeDriver: true }),
             ]).start(() => {
-                setTimeout(generateProblem, 2500); // Longer celebration time
+                setTimeout(generateProblem, 2500);
             });
         } else {
             setFeedback({ type: 'wrong' });
@@ -77,275 +74,306 @@ const MathScreen = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.container}>
-            <View style={styles.bootstrapContainer}>
-                {/* Utility Bar (Language & Coins) */}
-                <View style={styles.utilityBar}>
-                    <TouchableOpacity onPress={toggleLanguage} style={styles.langToggle}>
-                        <Languages size={18} color={COLORS.secondary} />
-                        <Text style={styles.langText}>{language.toUpperCase()}</Text>
-                    </TouchableOpacity>
+        <View style={styles.container}>
+            {/* Bootstrap-style Navbar */}
+            <View style={styles.navbar}>
+                <View style={styles.navbarContent}>
+                    <Text style={styles.navbarBrand}>{t.learnAndEarn}</Text>
 
-                    <View style={styles.coinsBadge}>
-                        <Coins color={COLORS.coins} size={24} />
-                        <Text style={styles.coinsText}>{coins}</Text>
+                    <View style={styles.navbarRight}>
+                        <TouchableOpacity onPress={toggleLanguage} style={styles.langToggle}>
+                            <Languages size={18} color="#6C757D" />
+                            <Text style={styles.langText}>{language.toUpperCase()}</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.coinsBadge}>
+                            <Coins color={COLORS.coins} size={20} />
+                            <Text style={styles.coinsText}>{coins}</Text>
+                        </View>
                     </View>
                 </View>
-
-                {/* Level Selector */}
-                <View style={styles.levelSelector}>
-                    {[0, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lvl) => (
-                        <TouchableOpacity
-                            key={lvl}
-                            onPress={() => updateLevel(lvl)}
-                            style={[
-                                styles.levelButton,
-                                currentLevel === lvl && styles.levelButtonActive,
-                                lvl === 0 && styles.mixButton
-                            ]}
-                        >
-                            <Text style={[
-                                styles.levelButtonText,
-                                currentLevel === lvl && styles.levelButtonTextActive
-                            ]}>{lvl === 0 ? 'Mix' : lvl}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
-
-                <Animated.View style={[
-                    styles.gameArea,
-                    { transform: [{ translateX: shakeAnimation }, { scale: scaleAnimation }] }
-                ]}>
-                    <Text style={styles.problemText}>{problem.a} × {problem.b} = ?</Text>
-
-                    {problem.reward > 0 && !feedback && (
-                        <View style={styles.rewardIndicator}>
-                            <Text style={styles.rewardText}>+{problem.reward}</Text>
-                            <Coins size={20} color={COLORS.coins} fill={COLORS.coins} style={{ marginLeft: 4 }} />
-                        </View>
-                    )}
-
-                    <MathGrid rows={problem.a} cols={problem.b} />
-
-
-                    {feedback && (
-                        <View style={styles.feedbackOverlay}>
-                            {feedback.type === 'correct' ? (
-                                <>
-                                    <Star color={COLORS.accent} size={64} fill={COLORS.accent} />
-                                    <Text style={styles.feedbackText}>{t.excellent}</Text>
-                                    <Text style={styles.coinsEarnedText}>+{feedback.amount} 💰</Text>
-                                </>
-                            ) : (
-                                <Text style={[styles.feedbackText, { color: COLORS.wrong }]}>
-                                    {t.oops} {problem.result}
-                                </Text>
-                            )}
-                        </View>
-                    )}
-                </Animated.View>
-
-                <View style={styles.optionsContainer}>
-                    {options.map((option, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            activeOpacity={0.7}
-                            style={[
-                                styles.optionButton,
-                                feedback?.type === 'correct' && option === problem.result && styles.correctButton,
-                                feedback?.type === 'wrong' && option === problem.result && styles.correctButtonHighlight,
-                            ]}
-                            onPress={() => !feedback && handleAnswer(option)}
-                            disabled={!!feedback}
-                        >
-                            <Text style={styles.optionText}>{option}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
             </View>
-        </ScrollView>
+
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.mainContent}>
+                    {/* Level Selector Card */}
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>Pasirink lentelę</Text>
+                        <View style={styles.levelSelector}>
+                            {[0, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lvl) => (
+                                <TouchableOpacity
+                                    key={lvl}
+                                    onPress={() => updateLevel(lvl)}
+                                    style={[
+                                        styles.levelButton,
+                                        currentLevel === lvl && styles.levelButtonActive,
+                                        lvl === 0 && styles.mixButton
+                                    ]}
+                                >
+                                    <Text style={[
+                                        styles.levelButtonText,
+                                        currentLevel === lvl && styles.levelButtonTextActive
+                                    ]}>{lvl === 0 ? 'Mix' : lvl}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+
+                    {/* Game Card */}
+                    <View style={styles.card}>
+                        <Animated.View style={[
+                            styles.gameArea,
+                            { transform: [{ translateX: shakeAnimation }, { scale: scaleAnimation }] }
+                        ]}>
+                            <Text style={styles.problemText}>{problem.a} × {problem.b} = ?</Text>
+
+                            {problem.reward > 0 && !feedback && (
+                                <View style={styles.rewardIndicator}>
+                                    <Text style={styles.rewardText}>+{problem.reward}</Text>
+                                    <Coins size={18} color={COLORS.coins} fill={COLORS.coins} style={{ marginLeft: 4 }} />
+                                </View>
+                            )}
+
+                            <MathGrid rows={problem.a} cols={problem.b} />
+
+                            {feedback && (
+                                <View style={styles.feedbackOverlay}>
+                                    {feedback.type === 'correct' ? (
+                                        <>
+                                            <Text style={styles.feedbackText}>{t.excellent}</Text>
+                                            <Text style={styles.coinsEarnedText}>+{feedback.amount} 💰</Text>
+                                        </>
+                                    ) : (
+                                        <Text style={[styles.feedbackText, { color: COLORS.wrong }]}>
+                                            {t.oops} {problem.result}
+                                        </Text>
+                                    )}
+                                </View>
+                            )}
+                        </Animated.View>
+
+                        <View style={styles.optionsContainer}>
+                            {options.map((option, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    activeOpacity={0.7}
+                                    style={[
+                                        styles.optionButton,
+                                        feedback?.type === 'correct' && option === problem.result && styles.correctButton,
+                                        feedback?.type === 'wrong' && option === problem.result && styles.correctButtonHighlight,
+                                    ]}
+                                    onPress={() => !feedback && handleAnswer(option)}
+                                    disabled={!!feedback}
+                                >
+                                    <Text style={styles.optionText}>{option}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
+        backgroundColor: '#F8F9FA',
     },
-    scrollContainer: {
-        flexGrow: 1,
-        alignItems: 'center',
-        paddingVertical: SPACING.sm,
+    navbar: {
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#DEE2E6',
+        paddingVertical: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
     },
-
-    bootstrapContainer: {
-        width: '100%',
-        maxWidth: 600,
-        paddingHorizontal: SPACING.md,
-    },
-    utilityBar: {
+    navbarContent: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: 4,
+        paddingHorizontal: windowWidth > 768 ? 40 : 16,
+        maxWidth: 1200,
+        width: '100%',
+        alignSelf: 'center',
+    },
+    navbarBrand: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: COLORS.primary,
+    },
+    navbarRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
     },
     langToggle: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.white,
+        backgroundColor: '#F8F9FA',
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderRadius: RADIUS.md,
-        borderWidth: 1,
-        borderColor: COLORS.border,
-        elevation: 2,
+        borderRadius: 6,
+        gap: 6,
     },
     langText: {
-        marginLeft: 4,
-        fontSize: 14,
-        fontWeight: '900',
-        color: COLORS.secondary,
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#6C757D',
     },
     coinsBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.white,
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-        borderRadius: RADIUS.full,
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        backgroundColor: '#FFF3CD',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
     },
     coinsText: {
-        marginLeft: 8,
+        fontSize: 16,
         fontWeight: 'bold',
+        color: '#856404',
+    },
+    scrollContainer: {
+        flexGrow: 1,
+        paddingVertical: 24,
+    },
+    mainContent: {
+        maxWidth: 1200,
+        width: '100%',
+        alignSelf: 'center',
+        paddingHorizontal: windowWidth > 768 ? 40 : 16,
+        gap: 20,
+    },
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#E9ECEF',
+    },
+    cardTitle: {
         fontSize: 18,
-        color: COLORS.text,
+        fontWeight: '700',
+        color: '#212529',
+        marginBottom: 16,
     },
     levelSelector: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginBottom: SPACING.lg,
+        gap: 8,
         justifyContent: 'center',
     },
     levelButton: {
-        backgroundColor: COLORS.white,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        borderRadius: RADIUS.md,
-        margin: 3,
-        minWidth: 40,
+        backgroundColor: '#F8F9FA',
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 8,
+        minWidth: 50,
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: COLORS.border,
+        borderWidth: 2,
+        borderColor: '#DEE2E6',
     },
-
     levelButtonActive: {
         backgroundColor: COLORS.primary,
         borderColor: COLORS.primary,
     },
     levelButtonText: {
-        fontWeight: 'bold',
-        color: COLORS.text,
+        fontWeight: '700',
+        fontSize: 16,
+        color: '#495057',
     },
     levelButtonTextActive: {
-        color: COLORS.white,
+        color: '#FFFFFF',
     },
     mixButton: {
         borderColor: COLORS.secondary,
-        borderWidth: 2,
     },
     gameArea: {
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 4,
+        paddingVertical: 16,
     },
-
     problemText: {
-        fontSize: 48, // Even smaller
+        fontSize: 52,
         fontWeight: '900',
-        color: COLORS.text,
-        marginBottom: 2,
+        color: '#212529',
+        marginBottom: 8,
     },
-
-
     rewardIndicator: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFF9C4', // Soft yellow
-        paddingHorizontal: 15,
-        paddingVertical: 6,
-        borderRadius: 15,
-        marginBottom: 10,
+        backgroundColor: '#FFF3CD',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        marginBottom: 16,
         borderWidth: 2,
-        borderColor: COLORS.coins,
+        borderColor: '#FFE69C',
     },
     rewardText: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: '900',
-        color: COLORS.text,
+        color: '#856404',
     },
-
-
     feedbackOverlay: {
-        position: 'absolute',
+        marginTop: 16,
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        padding: 30,
-        borderRadius: RADIUS.lg,
-        zIndex: 10,
-        width: '100%',
     },
     feedbackText: {
         fontSize: 28,
         fontWeight: '900',
         color: COLORS.correct,
-        marginTop: 10,
         textAlign: 'center',
     },
     coinsEarnedText: {
         fontSize: 32,
         fontWeight: '900',
         color: COLORS.coins,
-        marginTop: 5,
+        marginTop: 8,
     },
-
     optionsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        gap: 15,
-        marginBottom: SPACING.xl,
+        gap: 16,
+        marginTop: 24,
     },
     optionButton: {
-        backgroundColor: COLORS.white,
-        width: windowWidth > 400 ? 100 : 80,
-        height: windowWidth > 400 ? 100 : 80,
-        borderRadius: RADIUS.lg,
+        backgroundColor: '#FFFFFF',
+        width: windowWidth > 768 ? 120 : 100,
+        height: windowWidth > 768 ? 120 : 100,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 5,
+        borderWidth: 3,
         borderColor: COLORS.pastelBlue,
-        elevation: 5,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 3 },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 5,
+        shadowRadius: 4,
+        elevation: 3,
     },
-
     correctButton: {
         borderColor: COLORS.correct,
-        backgroundColor: '#E8F5E9',
+        backgroundColor: '#D4EDDA',
     },
     correctButtonHighlight: {
         borderColor: COLORS.correct,
-        borderWidth: 8,
+        borderWidth: 4,
     },
     optionText: {
-        fontSize: 40,
+        fontSize: 32,
         fontWeight: 'bold',
         color: COLORS.text,
     },

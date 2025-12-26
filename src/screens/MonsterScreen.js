@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Animated, Alert, ScrollView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Animated, Alert, Platform } from 'react-native';
 import { useGame, MONSTERS_POOL } from '../context/GameContext';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 import { Coins, Lock, CheckCircle } from 'lucide-react-native';
 
 const { width: windowWidth } = Dimensions.get('window');
-const COLUMN_COUNT = windowWidth > 500 ? 4 : 3;
+const COLUMN_COUNT = windowWidth > 992 ? 6 : windowWidth > 768 ? 4 : 3;
 
 const MonsterScreen = () => {
     const { coins, unlockedMonsterIds, buyMonster, t } = useGame();
-    const [hatchAnim] = useState(new Animated.Value(0));
-
     const [selectedMonster, setSelectedMonster] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
 
-    const ITEM_SIZE = windowWidth > 600 ? 120 : (windowWidth - 60) / COLUMN_COUNT;
+    const ITEM_SIZE = windowWidth > 992 ? 140 : windowWidth > 768 ? 120 : (windowWidth - 60) / COLUMN_COUNT;
 
     const handleBuyRequest = (monster) => {
         if (unlockedMonsterIds.includes(monster.id)) return;
@@ -27,7 +25,7 @@ const MonsterScreen = () => {
 
         if (coins < selectedMonster.cost) {
             if (Platform.OS === 'web') {
-                alert(`${t.notEnoughCoins}\n${t.playMore}`);
+                alert(`${t.notEnoughCoins}\\n${t.playMore}`);
             } else {
                 Alert.alert(t.notEnoughCoins, t.playMore);
             }
@@ -48,7 +46,6 @@ const MonsterScreen = () => {
         }
     };
 
-
     const renderMonsterItem = ({ item: monster }) => {
         const isUnlocked = unlockedMonsterIds.includes(monster.id);
 
@@ -56,11 +53,10 @@ const MonsterScreen = () => {
             <TouchableOpacity
                 style={[
                     styles.monsterCard,
-                    { width: ITEM_SIZE, height: ITEM_SIZE + 40 },
+                    { width: ITEM_SIZE, height: ITEM_SIZE + 50 },
                     isUnlocked && styles.unlockedCard
                 ]}
                 onPress={() => handleBuyRequest(monster)}
-
                 activeOpacity={isUnlocked ? 1 : 0.7}
             >
                 <View style={styles.emojiContainer}>
@@ -96,27 +92,38 @@ const MonsterScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.bootstrapContainer}>
-                <View style={styles.header}>
+            {/* Bootstrap-style Navbar */}
+            <View style={styles.navbar}>
+                <View style={styles.navbarContent}>
+                    <Text style={styles.navbarBrand}>{t.monsterRoom}</Text>
+
                     <View style={styles.coinsBadge}>
-                        <Coins color={COLORS.coins} size={24} />
+                        <Coins color={COLORS.coins} size={20} />
                         <Text style={styles.coinsText}>{coins}</Text>
                     </View>
                 </View>
+            </View>
 
-                <Text style={styles.subtitle}>{t.monsterRoom}</Text>
-                <Text style={styles.collectionInfo}>
-                    {unlockedMonsterIds.length} / {MONSTERS_POOL.length} {t.yourCollection}
-                </Text>
+            <View style={styles.mainContent}>
+                {/* Stats Card */}
+                <View style={styles.card}>
+                    <Text style={styles.statsText}>
+                        {unlockedMonsterIds.length} / {MONSTERS_POOL.length} {t.yourCollection}
+                    </Text>
+                </View>
 
-                <FlatList
-                    data={MONSTERS_POOL}
-                    renderItem={renderMonsterItem}
-                    keyExtractor={(item) => item.id}
-                    numColumns={COLUMN_COUNT}
-                    contentContainerStyle={styles.listContainer}
-                    showsVerticalScrollIndicator={false}
-                />
+                {/* Monsters Grid Card */}
+                <View style={styles.card}>
+                    <FlatList
+                        data={MONSTERS_POOL}
+                        renderItem={renderMonsterItem}
+                        keyExtractor={(item) => item.id}
+                        numColumns={COLUMN_COUNT}
+                        key={COLUMN_COUNT}
+                        contentContainerStyle={styles.listContainer}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </View>
             </View>
 
             {/* Custom Purchase Modal */}
@@ -153,114 +160,137 @@ const MonsterScreen = () => {
     );
 };
 
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: COLORS.background,
-        alignItems: 'center',
+        backgroundColor: '#F8F9FA',
     },
-    bootstrapContainer: {
-        flex: 1,
-        width: '100%',
-        maxWidth: 600,
-        paddingHorizontal: SPACING.md,
+    navbar: {
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#DEE2E6',
+        paddingVertical: 12,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
     },
-    header: {
+    navbarContent: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: SPACING.md,
+        paddingHorizontal: windowWidth > 768 ? 40 : 16,
+        maxWidth: 1200,
+        width: '100%',
+        alignSelf: 'center',
+    },
+    navbarBrand: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: COLORS.primary,
     },
     coinsBadge: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLORS.white,
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-        borderRadius: RADIUS.full,
-        elevation: 3,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        backgroundColor: '#FFF3CD',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 6,
     },
     coinsText: {
-        marginLeft: 8,
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: COLORS.text,
-    },
-    subtitle: {
-        fontSize: 28,
-        fontWeight: '900',
-        color: COLORS.primary,
-        textAlign: 'center',
-    },
-    collectionInfo: {
         fontSize: 16,
-        color: COLORS.secondary,
-        textAlign: 'center',
-        marginBottom: SPACING.lg,
+        fontWeight: 'bold',
+        color: '#856404',
+    },
+    mainContent: {
+        flex: 1,
+        maxWidth: 1200,
+        width: '100%',
+        alignSelf: 'center',
+        paddingHorizontal: windowWidth > 768 ? 40 : 16,
+        paddingVertical: 24,
+        gap: 20,
+    },
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 24,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#E9ECEF',
+    },
+    statsText: {
+        fontSize: 18,
         fontWeight: '600',
+        color: '#6C757D',
+        textAlign: 'center',
     },
     listContainer: {
-        paddingBottom: SPACING.xl,
+        paddingVertical: 8,
         alignItems: 'center',
+        gap: 16,
     },
     monsterCard: {
-        backgroundColor: COLORS.white,
+        backgroundColor: '#F8F9FA',
         margin: 8,
-        borderRadius: RADIUS.lg,
+        borderRadius: 12,
         justifyContent: 'space-between',
         alignItems: 'center',
-        elevation: 3,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         borderWidth: 2,
-        borderColor: COLORS.border,
-        paddingVertical: 10,
+        borderColor: '#DEE2E6',
+        paddingVertical: 12,
     },
     unlockedCard: {
         borderColor: COLORS.pastelGreen,
-        backgroundColor: '#F1F8E9',
+        backgroundColor: '#D4EDDA',
     },
     emojiContainer: {
         justifyContent: 'center',
         alignItems: 'center',
+        flex: 1,
     },
     monsterEmoji: {
         textAlign: 'center',
     },
     lockedEmoji: {
-        opacity: 0.2, // Silhouette effect
-        tintColor: '#000',
+        opacity: 0.2,
     },
     lockOverlay: {
         position: 'absolute',
         backgroundColor: 'rgba(0,0,0,0.5)',
         padding: 8,
-        borderRadius: RADIUS.full,
+        borderRadius: 20,
     },
     checkOverlay: {
         position: 'absolute',
-        top: -15,
-        right: -15,
+        top: -10,
+        right: -10,
     },
     priceTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#FFFFFF',
         paddingHorizontal: 12,
-        paddingVertical: 4,
-        borderRadius: RADIUS.md,
-        width: '80%',
+        paddingVertical: 6,
+        borderRadius: 12,
+        width: '90%',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#DEE2E6',
     },
     unlockedTag: {
         backgroundColor: COLORS.correct,
+        borderColor: COLORS.correct,
     },
     priceText: {
         fontSize: 14,
@@ -280,71 +310,69 @@ const styles = StyleSheet.create({
         zIndex: 1000,
     },
     modalContent: {
-        backgroundColor: COLORS.white,
-        width: '85%',
+        backgroundColor: '#FFFFFF',
+        width: '90%',
         maxWidth: 400,
-        padding: 30,
-        borderRadius: 30,
+        padding: 32,
+        borderRadius: 16,
         alignItems: 'center',
-        elevation: 20,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.3,
         shadowRadius: 20,
+        elevation: 20,
     },
     modalEmoji: {
         fontSize: 80,
-        marginBottom: 20,
+        marginBottom: 16,
     },
     modalTitle: {
         fontSize: 24,
-        fontWeight: '900',
-        color: COLORS.text,
-        marginBottom: 10,
+        fontWeight: '700',
+        color: '#212529',
+        marginBottom: 16,
     },
     modalPriceContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#FFF3CD',
         paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingVertical: 12,
         borderRadius: 20,
-        marginBottom: 30,
+        marginBottom: 24,
     },
     modalPriceText: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: COLORS.text,
-        marginRight: 8,
+        color: '#856404',
     },
     modalButtons: {
         flexDirection: 'row',
-        gap: 20,
+        gap: 12,
         width: '100%',
     },
     modalButton: {
         flex: 1,
-        paddingVertical: 15,
-        borderRadius: 20,
+        paddingVertical: 14,
+        borderRadius: 8,
         alignItems: 'center',
     },
     cancelButton: {
-        backgroundColor: '#EEEEEE',
+        backgroundColor: '#6C757D',
     },
     confirmButton: {
         backgroundColor: COLORS.primary,
     },
     cancelButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#666666',
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FFFFFF',
     },
     confirmButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: COLORS.white,
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#FFFFFF',
     },
 });
-
 
 export default MonsterScreen;

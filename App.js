@@ -19,28 +19,28 @@ function MainNavigator() {
     <Tab.Navigator
       screenOptions={{
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: '#BDBDBD',
+        tabBarInactiveTintColor: '#6C757D',
         tabBarIndicatorStyle: {
           backgroundColor: COLORS.primary,
-          height: 4,
-          borderRadius: 2,
+          height: 3,
         },
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
-          elevation: 5,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          height: 60,
-          justifyContent: 'center',
+          borderBottomWidth: 1,
+          borderBottomColor: '#DEE2E6',
+          height: 50,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.05,
+          shadowRadius: 2,
+          elevation: 2,
         },
         tabBarLabelStyle: {
-          fontSize: 13,
-          fontWeight: '900',
+          fontSize: 14,
+          fontWeight: '600',
           textTransform: 'none',
         },
-        tabBarShowIcon: true,
+        tabBarShowIcon: false,
       }}
     >
       <Tab.Screen
@@ -48,17 +48,17 @@ function MainNavigator() {
         component={MathScreen}
         options={{
           tabBarLabel: t.learnAndEarn,
-          tabBarIcon: ({ color }) => <Calculator color={color} size={20} />,
         }}
       />
+
       <Tab.Screen
         name="Monsters"
         component={MonsterScreen}
         options={{
           tabBarLabel: t.monsterRoom,
-          tabBarIcon: ({ color }) => <Ghost color={color} size={20} />,
         }}
       />
+
     </Tab.Navigator>
   );
 }
@@ -66,33 +66,16 @@ function MainNavigator() {
 export default function App() {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
-  const maxAppWidth = 600;
 
   return (
     <SafeAreaProvider>
-      <View style={[styles.outerContainer, isWeb && { backgroundColor: '#F0F4F8' }]}>
-        <View style={[
-          styles.innerContainer,
-          isWeb && width > maxAppWidth && {
-            width: maxAppWidth,
-            alignSelf: 'center',
-            marginVertical: 20,
-            borderRadius: 30,
-            overflow: 'hidden',
-            elevation: 20,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.2,
-            shadowRadius: 20,
-          }
-        ]}>
-          <GameProvider>
-            <NavigationContainer>
-              <StatusBar style="auto" />
-              <MainNavigator />
-            </NavigationContainer>
-          </GameProvider>
-        </View>
+      <View style={styles.outerContainer}>
+        <GameProvider>
+          <NavigationContainer>
+            <StatusBar style="auto" />
+            <MainNavigator />
+          </NavigationContainer>
+        </GameProvider>
       </View>
     </SafeAreaProvider>
   );
@@ -101,10 +84,6 @@ export default function App() {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F9FA', // Bootstrap light gray background
   },
-  innerContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  }
 });
