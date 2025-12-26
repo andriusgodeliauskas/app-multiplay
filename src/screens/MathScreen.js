@@ -47,16 +47,22 @@ const MathScreen = () => {
 
     const handleAnswer = (selected) => {
         if (selected === problem.result) {
-            setFeedback('correct');
-            addCoins(20);
+            // Difficulty-based rewards: sum of numbers determines the bonus
+            // 2x2 = 5 coins, 5x5 = 20 coins, 9x9 = 40 coins
+            const difficulty = problem.a + problem.b;
+            const earnedCoins = Math.max(5, (difficulty - 3) * 5);
+
+            setFeedback({ type: 'correct', amount: earnedCoins });
+            addCoins(earnedCoins);
+
             Animated.sequence([
                 Animated.spring(scaleAnimation, { toValue: 1.2, useNativeDriver: true }),
                 Animated.spring(scaleAnimation, { toValue: 1, useNativeDriver: true }),
             ]).start(() => {
-                setTimeout(generateProblem, 1000);
+                setTimeout(generateProblem, 1200);
             });
         } else {
-            setFeedback('wrong');
+            setFeedback({ type: 'wrong' });
             Animated.sequence([
                 Animated.timing(shakeAnimation, { toValue: 10, duration: 50, useNativeDriver: true }),
                 Animated.timing(shakeAnimation, { toValue: -10, duration: 50, useNativeDriver: true }),
@@ -112,10 +118,11 @@ const MathScreen = () => {
 
                     {feedback && (
                         <View style={styles.feedbackOverlay}>
-                            {feedback === 'correct' ? (
+                            {feedback.type === 'correct' ? (
                                 <>
                                     <Star color={COLORS.accent} size={64} fill={COLORS.accent} />
                                     <Text style={styles.feedbackText}>{t.excellent}</Text>
+                                    <Text style={styles.coinsEarnedText}>+{feedback.amount} 💰</Text>
                                 </>
                             ) : (
                                 <Text style={[styles.feedbackText, { color: COLORS.wrong }]}>
@@ -133,8 +140,8 @@ const MathScreen = () => {
                             activeOpacity={0.7}
                             style={[
                                 styles.optionButton,
-                                feedback === 'correct' && option === problem.result && styles.correctButton,
-                                feedback === 'wrong' && option === problem.result && styles.correctButtonHighlight,
+                                feedback?.type === 'correct' && option === problem.result && styles.correctButton,
+                                feedback?.type === 'wrong' && option === problem.result && styles.correctButtonHighlight,
                             ]}
                             onPress={() => !feedback && handleAnswer(option)}
                             disabled={!!feedback}
@@ -266,6 +273,13 @@ const styles = StyleSheet.create({
         marginTop: 10,
         textAlign: 'center',
     },
+    coinsEarnedText: {
+        fontSize: 32,
+        fontWeight: '900',
+        color: COLORS.coins,
+        marginTop: 5,
+    },
+
     optionsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
