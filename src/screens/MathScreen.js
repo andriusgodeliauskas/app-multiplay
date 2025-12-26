@@ -233,15 +233,16 @@ const styles = StyleSheet.create({
     },
     levelButton: {
         backgroundColor: COLORS.white,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        paddingHorizontal: 8,
+        paddingVertical: 6,
         borderRadius: RADIUS.md,
-        margin: 4,
-        minWidth: 45,
+        margin: 3,
+        minWidth: 40,
         alignItems: 'center',
         borderWidth: 1,
         borderColor: COLORS.border,
     },
+
     levelButtonActive: {
         backgroundColor: COLORS.primary,
         borderColor: COLORS.primary,
@@ -263,11 +264,12 @@ const styles = StyleSheet.create({
         marginVertical: SPACING.md,
     },
     problemText: {
-        fontSize: 64,
+        fontSize: 56, // Smaller
         fontWeight: '900',
         color: COLORS.text,
-        marginBottom: SPACING.xs,
+        marginBottom: 4,
     },
+
     rewardIndicator: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -318,19 +320,20 @@ const styles = StyleSheet.create({
     },
     optionButton: {
         backgroundColor: COLORS.white,
-        width: windowWidth > 400 ? 120 : 90,
-        height: windowWidth > 400 ? 120 : 90,
+        width: windowWidth > 400 ? 100 : 80,
+        height: windowWidth > 400 ? 100 : 80,
         borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 6,
+        borderWidth: 5,
         borderColor: COLORS.pastelBlue,
-        elevation: 6,
+        elevation: 5,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
+        shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.1,
-        shadowRadius: 6,
+        shadowRadius: 5,
     },
+
     correctButton: {
         borderColor: COLORS.correct,
         backgroundColor: '#E8F5E9',

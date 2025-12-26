@@ -11,15 +11,15 @@ export const MathGrid = ({ rows, cols }) => {
     // Dynamic dot size based on columns AND rows
     // Max width/height to keep it "not static/too tall"
     const maxGridWidth = Math.min(windowWidth - 60, 500);
-    const maxGridHeight = Math.min(windowHeight * 0.4, 400); // Max 40% of screen height
+    const maxGridHeight = Math.min(windowHeight * 0.25, 220); // Much smaller max height
 
     // Calculate cell size that fits both dimensions
-    const cellWidth = Math.floor(maxGridWidth / cols) - 4;
-    const cellHeight = Math.floor(maxGridHeight / rows) - 4;
+    const cellWidth = Math.floor(maxGridWidth / cols) - 2;
+    const cellHeight = Math.floor(maxGridHeight / rows) - 2;
 
-    // Choose the smaller one so it fits in both directions, but cap at 30px
-    const cellSize = Math.min(30, cellWidth, cellHeight);
-    const dotSize = cellSize * 0.75;
+    // Cap at 22px to keep it compact
+    const cellSize = Math.min(22, cellWidth, cellHeight);
+    const dotSize = cellSize * 0.7;
 
     return (
         <View style={styles.container}>
