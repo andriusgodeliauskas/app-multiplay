@@ -11,44 +11,43 @@ const MonsterScreen = () => {
     const { coins, unlockedMonsterIds, buyMonster, t } = useGame();
     const [hatchAnim] = useState(new Animated.Value(0));
 
+    const [selectedMonster, setSelectedMonster] = useState(null);
+    const [modalVisible, setModalVisible] = useState(false);
+
     const ITEM_SIZE = windowWidth > 600 ? 120 : (windowWidth - 60) / COLUMN_COUNT;
 
-    const handleBuy = (monster) => {
+    const handleBuyRequest = (monster) => {
         if (unlockedMonsterIds.includes(monster.id)) return;
+        setSelectedMonster(monster);
+        setModalVisible(true);
+    };
 
-        if (coins < monster.cost) {
+    const confirmPurchase = () => {
+        if (!selectedMonster) return;
+
+        if (coins < selectedMonster.cost) {
             if (Platform.OS === 'web') {
                 alert(`${t.notEnoughCoins}\n${t.playMore}`);
             } else {
                 Alert.alert(t.notEnoughCoins, t.playMore);
             }
+            setModalVisible(false);
             return;
         }
 
-        const confirmMessage = `${monster.emoji}? Cost: ${monster.cost} 💰`;
-
-        if (Platform.OS === 'web') {
-            if (window.confirm(confirmMessage)) {
-                const result = buyMonster(monster.id);
-                if (!result.success) alert(result.message);
-            }
+        const result = buyMonster(selectedMonster.id);
+        if (result.success) {
+            setModalVisible(false);
+            setSelectedMonster(null);
         } else {
-            Alert.alert(
-                t.monsterRoom,
-                confirmMessage,
-                [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                        text: 'Unlock!',
-                        onPress: () => {
-                            const result = buyMonster(monster.id);
-                            if (!result.success) Alert.alert("Oops!", result.message);
-                        }
-                    }
-                ]
-            );
+            if (Platform.OS === 'web') {
+                alert(result.message);
+            } else {
+                Alert.alert("Oops!", result.message);
+            }
         }
     };
+
 
     const renderMonsterItem = ({ item: monster }) => {
         const isUnlocked = unlockedMonsterIds.includes(monster.id);
@@ -60,7 +59,8 @@ const MonsterScreen = () => {
                     { width: ITEM_SIZE, height: ITEM_SIZE + 40 },
                     isUnlocked && styles.unlockedCard
                 ]}
-                onPress={() => handleBuy(monster)}
+                onPress={() => handleBuyRequest(monster)}
+
                 activeOpacity={isUnlocked ? 1 : 0.7}
             >
                 <View style={styles.emojiContainer}>
@@ -117,9 +117,41 @@ const MonsterScreen = () => {
                     showsVerticalScrollIndicator={false}
                 />
             </View>
+
+            {/* Custom Purchase Modal */}
+            {modalVisible && selectedMonster && (
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalEmoji}>{selectedMonster.emoji}</Text>
+                        <Text style={styles.modalTitle}>{t.buyEgg}?</Text>
+
+                        <View style={styles.modalPriceContainer}>
+                            <Text style={styles.modalPriceText}>{selectedMonster.cost}</Text>
+                            <Coins size={24} color={COLORS.coins} fill={COLORS.coins} style={{ marginLeft: 4 }} />
+                        </View>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelButton]}
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={styles.cancelButtonText}>Ne</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.confirmButton]}
+                                onPress={confirmPurchase}
+                            >
+                                <Text style={styles.confirmButtonText}>Taip!</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            )}
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -234,6 +266,84 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: COLORS.text,
     },
+    // Modal Styles
+    modalOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    modalContent: {
+        backgroundColor: COLORS.white,
+        width: '85%',
+        maxWidth: 400,
+        padding: 30,
+        borderRadius: 30,
+        alignItems: 'center',
+        elevation: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+    },
+    modalEmoji: {
+        fontSize: 80,
+        marginBottom: 20,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: '900',
+        color: COLORS.text,
+        marginBottom: 10,
+    },
+    modalPriceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 20,
+        marginBottom: 30,
+    },
+    modalPriceText: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: COLORS.text,
+        marginRight: 8,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        gap: 20,
+        width: '100%',
+    },
+    modalButton: {
+        flex: 1,
+        paddingVertical: 15,
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    cancelButton: {
+        backgroundColor: '#EEEEEE',
+    },
+    confirmButton: {
+        backgroundColor: COLORS.primary,
+    },
+    cancelButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#666666',
+    },
+    confirmButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.white,
+    },
 });
+
 
 export default MonsterScreen;
