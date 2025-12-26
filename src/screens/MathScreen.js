@@ -122,6 +122,7 @@ const MathScreen = () => {
                 {options.map((option, index) => (
                     <TouchableOpacity
                         key={index}
+                        activeOpacity={0.7}
                         style={[
                             styles.optionButton,
                             feedback === 'correct' && option === problem.result && styles.correctButton,
@@ -134,6 +135,7 @@ const MathScreen = () => {
                     </TouchableOpacity>
                 ))}
             </View>
+
         </View>
     );
 };
@@ -152,10 +154,11 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.lg,
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: '900',
         color: COLORS.primary,
     },
+
     levelSelector: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -203,11 +206,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     problemText: {
-        fontSize: 48,
+        fontSize: 64, // Larger for big screens
         fontWeight: '900',
         color: COLORS.text,
         marginBottom: SPACING.md,
     },
+
     feedbackOverlay: {
         position: 'absolute',
         alignItems: 'center',
@@ -229,15 +233,17 @@ const styles = StyleSheet.create({
     },
     optionButton: {
         backgroundColor: COLORS.white,
-        width: width / 4,
-        height: width / 4,
-        borderRadius: RADIUS.md,
+        width: 120, // Fixed larger size for touch
+        height: 120,
+        borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 4,
+        borderWidth: 6,
         borderColor: COLORS.pastelBlue,
-        elevation: 5,
+        elevation: 8,
+        marginHorizontal: 10,
     },
+
     correctButton: {
         borderColor: COLORS.correct,
         backgroundColor: '#E8F5E9',
@@ -247,10 +253,11 @@ const styles = StyleSheet.create({
         borderWidth: 6,
     },
     optionText: {
-        fontSize: 32,
+        fontSize: 40,
         fontWeight: 'bold',
         color: COLORS.text,
     },
+
 });
 
 export default MathScreen;

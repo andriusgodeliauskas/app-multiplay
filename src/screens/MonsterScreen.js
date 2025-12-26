@@ -6,7 +6,9 @@ import { Coins, ShoppingBag, Gift } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const COLUMN_COUNT = 3;
-const ITEM_SIZE = (width - SPACING.md * 4) / COLUMN_COUNT;
+// For web/laptop, we want fixed sizes that don't stretch too much
+const ITEM_SIZE = 140;
+
 
 const MonsterScreen = () => {
     const { coins, unlockedMonsters, unlockMonster } = useGame();
@@ -149,17 +151,19 @@ const styles = StyleSheet.create({
         width: ITEM_SIZE,
         height: ITEM_SIZE,
         backgroundColor: COLORS.white,
-        margin: SPACING.sm / 2,
-        borderRadius: RADIUS.md,
+        margin: 10,
+        borderRadius: RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 2,
-        borderWidth: 2,
+        elevation: 4,
+        borderWidth: 3,
         borderColor: COLORS.pastelGreen,
     },
+
     monsterEmoji: {
-        fontSize: 40,
+        fontSize: 60,
     },
+
 });
 
 export default MonsterScreen;

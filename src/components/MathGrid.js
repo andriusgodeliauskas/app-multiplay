@@ -23,22 +23,25 @@ const styles = StyleSheet.create({
     container: {
         padding: SPACING.md,
         backgroundColor: COLORS.white,
-        borderRadius: 20,
-        borderWidth: 4,
+        borderRadius: 24,
+        borderWidth: 6,
         borderColor: COLORS.pastelBlue,
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: SPACING.lg,
         alignSelf: 'center',
+        minHeight: 180,
+        minWidth: 180,
     },
     row: {
         flexDirection: 'row',
     },
     dot: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
+        width: 30, // Larger dots for better visibility on laptop
+        height: 30,
+        borderRadius: 15,
         backgroundColor: COLORS.secondary,
-        margin: 4,
+        margin: 6,
     },
 });
+
