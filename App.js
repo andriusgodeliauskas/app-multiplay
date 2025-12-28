@@ -67,11 +67,21 @@ export default function App() {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
 
+  const linking = {
+    prefixes: ['/multiplay'],
+    config: {
+      screens: {
+        Math: '',
+        Monsters: 'monsters',
+      },
+    },
+  };
+
   return (
     <SafeAreaProvider>
       <View style={styles.outerContainer}>
         <GameProvider>
-          <NavigationContainer fallback={<View />}>
+          <NavigationContainer linking={linking} fallback={<View />}>
             <StatusBar style="auto" />
             <MainNavigator />
           </NavigationContainer>
