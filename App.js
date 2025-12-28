@@ -9,6 +9,7 @@ import { COLORS } from './src/constants/theme';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { View, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import * as Linking from 'expo-linking';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -67,8 +68,11 @@ export default function App() {
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
 
+  // Create a dynamic prefix that works for both local and prod
+  const prefix = Linking.createURL('/');
+
   const linking = {
-    prefixes: ['/multiplay'],
+    prefixes: [prefix, 'https://godeliauskas.com/multiplay'],
     config: {
       screens: {
         Math: '',
