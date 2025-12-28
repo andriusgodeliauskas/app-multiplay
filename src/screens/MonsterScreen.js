@@ -104,27 +104,27 @@ const MonsterScreen = () => {
                 </View>
             </View>
 
-            <View style={styles.mainContent}>
-                {/* Stats Card */}
-                <View style={styles.card}>
-                    <Text style={styles.statsText}>
-                        {unlockedMonsterIds.length} / {MONSTERS_POOL.length} {t.yourCollection}
-                    </Text>
-                </View>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.mainContent}>
+                    {/* Stats Card */}
+                    <View style={styles.card}>
+                        <Text style={styles.statsText}>
+                            {unlockedMonsterIds.length} / {MONSTERS_POOL.length} {t.yourCollection}
+                        </Text>
+                    </View>
 
-                {/* Monsters Grid Card */}
-                <View style={styles.card}>
-                    <FlatList
-                        data={MONSTERS_POOL}
-                        renderItem={renderMonsterItem}
-                        keyExtractor={(item) => item.id}
-                        numColumns={COLUMN_COUNT}
-                        key={COLUMN_COUNT}
-                        contentContainerStyle={styles.listContainer}
-                        showsVerticalScrollIndicator={false}
-                    />
+                    {/* Monsters Grid Card */}
+                    <View style={styles.card}>
+                        <View style={styles.gridContainer}>
+                            {MONSTERS_POOL.map((monster) => (
+                                <View key={monster.id} style={{ width: ITEM_SIZE, margin: 8 }}>
+                                    {renderMonsterItem({ item: monster })}
+                                </View>
+                            ))}
+                        </View>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
 
             {/* Custom Purchase Modal */}
             {modalVisible && selectedMonster && (
@@ -204,13 +204,15 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#856404',
     },
+    scrollContainer: {
+        flexGrow: 1,
+        paddingVertical: 24,
+    },
     mainContent: {
-        flex: 1,
         maxWidth: 1200,
         width: '100%',
         alignSelf: 'center',
         paddingHorizontal: windowWidth > 768 ? 40 : 16,
-        paddingVertical: 24,
         gap: 20,
     },
     card: {
@@ -231,14 +233,16 @@ const styles = StyleSheet.create({
         color: '#6C757D',
         textAlign: 'center',
     },
-    listContainer: {
-        paddingVertical: 8,
-        alignItems: 'center',
-        gap: 16,
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
     },
     monsterCard: {
         backgroundColor: '#F8F9FA',
-        margin: 8,
+        width: '100%', // Take full width of wrapper
+        height: '100%', // Take full height
         borderRadius: 12,
         justifyContent: 'space-between',
         alignItems: 'center',
