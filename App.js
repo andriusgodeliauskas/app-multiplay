@@ -72,7 +72,7 @@ export default function App() {
   const prefix = Linking.createURL('/');
 
   const linking = {
-    prefixes: [prefix, 'https://godeliauskas.com/multiplay'],
+    prefixes: [prefix, 'https://multiplay.godeliauskas.com'],
     config: {
       screens: {
         Math: '',
