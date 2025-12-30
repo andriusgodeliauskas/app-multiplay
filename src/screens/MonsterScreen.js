@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, Animated, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Animated, Alert, Platform } from 'react-native';
 import { useGame, MONSTERS_POOL } from '../context/GameContext';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 import { Coins, Lock, CheckCircle } from 'lucide-react-native';
