@@ -30,6 +30,7 @@ export const GameProvider = ({ children }) => {
     const [unlockedMonsterIds, setUnlockedMonsterIds] = useState(['m1']);
     const [currentLevel, setCurrentLevel] = useState(2);
     const [language, setLanguage] = useState('lt');
+    const [musicOn, setMusicOn] = useState(true);
     const [loading, setLoading] = useState(true);
 
     const t = TRANSLATIONS[language] || TRANSLATIONS.en;
@@ -45,11 +46,13 @@ export const GameProvider = ({ children }) => {
             const savedMonsters = await AsyncStorage.getItem('@unlockedMonsterIds');
             const savedLevel = await AsyncStorage.getItem('@currentLevel');
             const savedLang = await AsyncStorage.getItem('@language');
+            const savedMusic = await AsyncStorage.getItem('@musicOn');
 
             if (savedCoins !== null) setCoins(parseInt(savedCoins));
             if (savedMonsters !== null) setUnlockedMonsterIds(JSON.parse(savedMonsters));
             if (savedLevel !== null) setCurrentLevel(parseInt(savedLevel));
             if (savedLang !== null) setLanguage(savedLang);
+            if (savedMusic !== null) setMusicOn(savedMusic === 'true');
         } catch (e) {
             console.error('Failed to load game data', e);
         } finally {
@@ -57,12 +60,13 @@ export const GameProvider = ({ children }) => {
         }
     };
 
-    const saveGameData = async (newCoins, newMonsters, newLevel, newLang) => {
+    const saveGameData = async (newCoins, newMonsters, newLevel, newLang, newMusic) => {
         try {
             if (newCoins !== undefined && newCoins !== null) await AsyncStorage.setItem('@coins', newCoins.toString());
             if (newMonsters) await AsyncStorage.setItem('@unlockedMonsterIds', JSON.stringify(newMonsters));
             if (newLevel !== undefined && newLevel !== null) await AsyncStorage.setItem('@currentLevel', newLevel.toString());
             if (newLang) await AsyncStorage.setItem('@language', newLang);
+            if (newMusic !== undefined && newMusic !== null) await AsyncStorage.setItem('@musicOn', newMusic.toString());
         } catch (e) {
             console.error('Failed to save game data', e);
         }
@@ -78,6 +82,12 @@ export const GameProvider = ({ children }) => {
         const nextLang = language === 'lt' ? 'en' : 'lt';
         setLanguage(nextLang);
         saveGameData(null, null, null, nextLang);
+    };
+
+    const toggleMusic = () => {
+        const nextMusic = !musicOn;
+        setMusicOn(nextMusic);
+        saveGameData(null, null, null, null, nextMusic);
     };
 
     const buyMonster = (monsterId) => {
@@ -110,11 +120,13 @@ export const GameProvider = ({ children }) => {
             unlockedMonsterIds,
             currentLevel,
             language,
+            musicOn,
             t,
             addCoins,
             buyMonster,
             updateLevel,
             toggleLanguage,
+            toggleMusic,
             loading
         }}>
             {children}

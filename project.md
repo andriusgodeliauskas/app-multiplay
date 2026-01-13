@@ -1,6 +1,20 @@
 # App Multiplay
 
-Tai yra „App Multiplay“ projektas.
+Tai yra „App Multiplay“ projektas – mokomoji ir pramoginė programėlė, sukurta su React Native (Expo).
+
+## Funkcionalumas (Features)
+
+*   **Matematikos žaidimas:** Vartotojai sprendžia matematinius uždavinius ("Learn & Earn").
+*   **Monstrų kambarys:** Uždirbtus pinigus galima leisti perkant ir atrakinant įvairius monstrus.
+*   **Ekonomika:** Monetų kaupimas sprendžiant uždavinius.
+*   **Nustatymai:**
+    *   Foninė muzika su įjungimo/išjungimo galimybe.
+    *   Kalbų palaikymas (LT/EN).
+*   **Technologijos:**
+    *   React Native / Expo
+    *   React Navigation (Material Top Tabs)
+    *   AsyncStorage (duomenų saugojimui)
+    *   Expo AV (garsui)
 
 ## GitHub Saugykla
 
